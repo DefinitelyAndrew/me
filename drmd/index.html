@@ -21,63 +21,106 @@
             background: #1e1e1e;
             border: 4px solid #ff9e1b; /* CCL Orange */
             border-radius: 20px;
-            padding: 40px;
+            padding: 30px 40px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(255, 158, 27, 0.3);
-            width: 500px; /* Kept original width */
+            width: 520px;
             max-width: 90%;
+            position: relative;
         }
-        
-        /* Reverted back to the actual solid circle without the spinner gap */
+
+        /* Authentic Circular Map Track */
         .circle-container {
             position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 30px auto;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 15px auto;
         }
-        .circle-ring {
+        .circle-svg {
             width: 100%;
             height: 100%;
-            border: 6px solid #ff9e1b; 
-            border-radius: 50%;
-            box-sizing: border-box;
+            transform: rotate(-90deg); /* Start CC1 at the top position */
+        }
+        .track-bg {
+            fill: none;
+            stroke: rgba(255, 158, 27, 0.25);
+            stroke-width: 6;
+        }
+        .track-progress {
+            fill: none;
+            stroke: #ff9e1b;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 502; /* 2 * PI * 80 */
+            stroke-dashoffset: 502;
+            transition: stroke-dashoffset 0.4s ease-in-out;
+        }
+        .station-node {
+            fill: #1e1e1e;
+            stroke: #ff9e1b;
+            stroke-width: 2;
+            r: 4;
+            transition: all 0.3s ease;
+        }
+        .station-node.visited {
+            fill: #ff9e1b;
+        }
+        .station-node.active {
+            fill: #39ff14;
+            stroke: #ffffff;
+            stroke-width: 2.5;
+            r: 7;
+            filter: drop-shadow(0px 0px 6px #39ff14);
         }
         .circle-inner {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 800;
             color: #ff9e1b;
             text-align: center;
+            line-height: 1.2;
+            letter-spacing: 1px;
         }
 
-        /* Reverted back to original clean text format without the pill background */
         .station-code {
             font-size: 24px;
             font-weight: bold;
             color: #ff9e1b;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .station-name {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            min-height: 42px;
         }
 
-        /* Centered blinking doors indicator to fit the original format */
-        .door-indicator {
-            font-size: 20px;
-            font-weight: bold;
-            color: #39ff14;
-            height: 24px;
-            margin-bottom: 25px;
-            text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+        /* Door Opening Indicator Banner */
+        .door-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #121212;
+            border: 2px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 8px 20px;
+            margin-bottom: 20px;
+            height: 28px;
         }
-        .blink-animation {
+        .door-side {
+            font-size: 16px;
+            font-weight: 800;
+            color: #39ff14;
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
+            visibility: hidden;
+        }
+        .door-side.active {
+            visibility: visible;
             animation: blinkFast 0.8s step-end infinite;
         }
         @keyframes blinkFast {
@@ -85,7 +128,6 @@
             50% { opacity: 0; }
         }
 
-        /* Reverted back to original ARRIVING AT STATION text */
         .status-box {
             font-size: 18px;
             font-weight: 600;
@@ -95,7 +137,7 @@
             color: #ff9e1b;
             display: inline-block;
             animation: pulseAnimation 1.5s infinite;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         @keyframes pulseAnimation {
             0% { opacity: 0.4; transform: scale(1); }
@@ -127,15 +169,24 @@
 <body>
 
     <div class="display-container">
+        <!-- SVG Circular Line Map -->
         <div class="circle-container">
-            <div class="circle-ring"></div>
-            <div class="circle-inner">CC LINE</div>
+            <svg class="circle-svg" viewBox="0 0 200 200">
+                <circle class="track-bg" cx="100" cy="100" r="80" />
+                <circle class="track-progress" id="trackProgress" cx="100" cy="100" r="80" />
+                <g id="stationNodesGroup"></g>
+            </svg>
+            <div class="circle-inner" id="lineName">CIRCLE<br>LINE</div>
         </div>
         
         <div class="station-code" id="stationCode">CC1</div>
         <div class="station-name" id="stationName">Dhoby Ghaut</div>
         
-        <div class="door-indicator" id="doorIndicator">&lt;&lt; DOORS OPENING</div>
+        <!-- Door Indicator Banner -->
+        <div class="door-banner">
+            <div class="door-side" id="doorLeft">&lt;&lt; DOORS OPENING</div>
+            <div class="door-side" id="doorRight">DOORS OPENING &gt;&gt;</div>
+        </div>
 
         <div class="status-box" id="statusText">ARRIVING AT STATION</div>
         <br>
@@ -143,7 +194,7 @@
     </div>
 
     <script>
-        // Full array containing all operational stations and their respective door sides
+        // Full list of operational Circle Line stations (CC1 - CC29, CC18 Bukit Brown skipped)
         const stations = [
             { code: "CC1", name: "Dhoby Ghaut", doorSide: "right" },
             { code: "CC2", name: "Bras Basah", doorSide: "left" },
@@ -176,31 +227,74 @@
         ];
 
         let currentIndex = 0;
+        const totalStations = stations.length;
+        const radius = 80;
+        const circumference = 2 * Math.PI * radius;
+
+        // Build SVG Station Nodes around the Circle
+        function initCircularMap() {
+            const group = document.getElementById("stationNodesGroup");
+            group.innerHTML = "";
+
+            stations.forEach((station, index) => {
+                const angle = (index / totalStations) * (2 * Math.PI);
+                const x = 100 + radius * Math.cos(angle);
+                const y = 100 + radius * Math.sin(angle);
+
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+                circle.setAttribute("class", "station-node");
+                circle.setAttribute("id", `node-${index}`);
+                group.appendChild(circle);
+            });
+        }
 
         function updateDisplay() {
             const station = stations[currentIndex];
             
-            // Update Core Info
+            // Update Text
             document.getElementById("stationCode").textContent = station.code;
             document.getElementById("stationName").textContent = station.name;
-            
-            // Handle Door Indicator Direction
-            const doorIndicator = document.getElementById("doorIndicator");
+
+            // Update Circle Map Progress Line
+            const trackProgress = document.getElementById("trackProgress");
+            const progressRatio = currentIndex / (totalStations - 1);
+            const strokeOffset = circumference - (progressRatio * circumference);
+            trackProgress.style.strokeDashoffset = strokeOffset;
+
+            // Update Station Node Highlights
+            stations.forEach((_, idx) => {
+                const node = document.getElementById(`node-${idx}`);
+                node.classList.remove("active", "visited");
+                if (idx < currentIndex) {
+                    node.classList.add("visited");
+                } else if (idx === currentIndex) {
+                    node.classList.add("active");
+                }
+            });
+
+            // Handle Door Indicator Blinking
+            const doorLeft = document.getElementById("doorLeft");
+            const doorRight = document.getElementById("doorRight");
+
+            doorLeft.classList.remove("active");
+            doorRight.classList.remove("active");
+
+            // Force DOM Reflow to ensure animation loops cleanly
+            void doorLeft.offsetWidth;
+            void doorRight.offsetWidth;
+
             if (station.doorSide === "left") {
-                doorIndicator.textContent = "<< DOORS OPENING";
+                doorLeft.classList.add("active");
             } else {
-                doorIndicator.textContent = "DOORS OPENING >>";
+                doorRight.classList.add("active");
             }
 
-            // Reset Door Animation
-            doorIndicator.classList.remove("blink-animation");
-            void doorIndicator.offsetWidth; // Trigger DOM reflow
-            doorIndicator.classList.add("blink-animation");
-
-            // Reset Pulse Animation for Status Box
+            // Reset Pulse Animation for Status Text
             const statusBox = document.getElementById("statusText");
             statusBox.style.animation = 'none';
-            statusBox.offsetHeight; // Trigger DOM reflow
+            statusBox.offsetHeight;
             statusBox.style.animation = 'pulseAnimation 1.5s infinite';
         }
 
@@ -209,7 +303,8 @@
             updateDisplay();
         }
 
-        // Initial load
+        // Initialize Map and Load First Station
+        initCircularMap();
         updateDisplay();
     </script>
 
