@@ -1,312 +1,638 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMRT Circle Line Station Display</title>
-    <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        .display-container {
-            background: #1e1e1e;
-            border: 4px solid #ff9e1b; /* CCL Orange */
-            border-radius: 20px;
-            padding: 30px 40px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(255, 158, 27, 0.3);
-            width: 520px;
-            max-width: 90%;
-            position: relative;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRMD | Circular CCL Display</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Authentic Circular Map Track */
-        .circle-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 15px auto;
-        }
-        .circle-svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg); /* Start CC1 at the top position */
-        }
-        .track-bg {
-            fill: none;
-            stroke: rgba(255, 158, 27, 0.25);
-            stroke-width: 6;
-        }
-        .track-progress {
-            fill: none;
-            stroke: #ff9e1b;
-            stroke-width: 6;
-            stroke-linecap: round;
-            stroke-dasharray: 502; /* 2 * PI * 80 */
-            stroke-dashoffset: 502;
-            transition: stroke-dashoffset 0.4s ease-in-out;
-        }
-        .station-node {
-            fill: #1e1e1e;
-            stroke: #ff9e1b;
-            stroke-width: 2;
-            r: 4;
-            transition: all 0.3s ease;
-        }
-        .station-node.visited {
-            fill: #ff9e1b;
-        }
-        .station-node.active {
-            fill: #39ff14;
-            stroke: #ffffff;
-            stroke-width: 2.5;
-            r: 7;
-            filter: drop-shadow(0px 0px 6px #39ff14);
-        }
-        .circle-inner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
-            font-weight: 800;
-            color: #ff9e1b;
-            text-align: center;
-            line-height: 1.2;
-            letter-spacing: 1px;
-        }
+body {
+    background: #111;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 16px;
+    font-family: 'Inter', sans-serif;
+}
 
-        .station-code {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff9e1b;
-            margin-bottom: 5px;
-        }
-        .station-name {
-            font-size: 34px;
-            font-weight: 800;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            min-height: 42px;
-        }
+/* ── Bezel ── */
+.drmd-outer {
+    width: 100%;
+    max-width: 1200px;
+    background: #000;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 
+        0 8px 32px rgba(0,0,0,0.8),
+        inset 0 1px 2px rgba(255,255,255,0.1);
+    border: 2px solid #222;
+}
 
-        /* Door Opening Indicator Banner */
-        .door-banner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #121212;
-            border: 2px solid #2a2a2a;
-            border-radius: 10px;
-            padding: 8px 20px;
-            margin-bottom: 20px;
-            height: 28px;
-        }
-        .door-side {
-            font-size: 16px;
-            font-weight: 800;
-            color: #39ff14;
-            text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
-            visibility: hidden;
-        }
-        .door-side.active {
-            visibility: visible;
-            animation: blinkFast 0.8s step-end infinite;
-        }
-        @keyframes blinkFast {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+/* ── White/LCD panel ── */
+.drmd-panel {
+    background: #0a0a0a;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid #1a1a1a;
+}
 
-        .status-box {
-            font-size: 18px;
-            font-weight: 600;
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: rgba(255, 158, 27, 0.15);
-            color: #ff9e1b;
-            display: inline-block;
-            animation: pulseAnimation 1.5s infinite;
-            margin-bottom: 25px;
-        }
-        @keyframes pulseAnimation {
-            0% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.03); }
-            100% { opacity: 0.4; transform: scale(1); }
-        }
+/* ── LCD Header (C851E Style) ── */
+.lcd-header {
+    background: #151515;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 2px solid #222;
+    flex-shrink: 0;
+}
+.lcd-dest {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f99d25;
+    letter-spacing: 0.02em;
+}
+.lcd-status {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
 
-        .btn {
-            background-color: #ff9e1b;
-            color: #121212;
-            border: none;
-            padding: 14px 28px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            box-shadow: 0 4px 10px rgba(255, 158, 27, 0.4);
-        }
-        .btn:hover {
-            background-color: #ffa834;
-            transform: translateY(-2px);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-    </style>
+/* ── Main row ── */
+.map-row {
+    display: flex;
+    align-items: stretch;
+    height: 400px; /* Increased height for the circular map */
+    position: relative;
+}
+
+/* ── Big Door Overlays (C851E Style + Blinking) ── */
+.door-overlay {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 160px;
+    background: rgba(10, 180, 50, 0.95);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    text-align: center;
+    line-height: 1.2;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 50;
+    box-shadow: 0 0 30px rgba(10, 180, 50, 0.4);
+    pointer-events: none;
+}
+.door-overlay.left { 
+    left: 0; 
+    border-right: 4px solid #fff; 
+    transform: translateX(-20px);
+}
+.door-overlay.right { 
+    right: 0; 
+    border-left: 4px solid #fff; 
+    transform: translateX(20px);
+}
+.door-overlay.active { 
+    opacity: 1; 
+    transform: translateX(0);
+}
+
+/* Authentic Blinking Animation for the text and arrows inside the active overlay */
+.door-overlay.active .door-content {
+    animation: blinkText 1s infinite;
+}
+@keyframes blinkText {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0.2; }
+}
+
+.door-overlay .chevron {
+    font-size: 36px;
+    margin-top: 10px;
+    animation: bounceDown 0.6s infinite alternate;
+}
+@keyframes bounceDown {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(12px); }
+}
+
+/* ── Map area ── */
+.map-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#mapSvg { 
+    display: block; 
+    width: 100%; 
+    height: 100%;
+}
+
+/* ── Flowing Direction Line ── */
+.flow-line {
+    stroke-dasharray: 12 12;
+    animation: flowDash 1s linear infinite;
+}
+.flow-line.ccw {
+    animation: flowDashRev 1s linear infinite;
+}
+@keyframes flowDash {
+    to { stroke-dashoffset: -24; }
+}
+@keyframes flowDashRev {
+    to { stroke-dashoffset: 24; }
+}
+
+/* ── Controls ── */
+.controls {
+    width: 100%; max-width: 1200px;
+    display: flex; flex-direction: column; gap: 10px;
+    background: #1e1e1e;
+    padding: 16px;
+    border-radius: 8px;
+}
+.ctrl-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.ctrl-lbl {
+    font-size: 11px; font-weight: 700; color: #888;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    min-width: 110px; padding-top: 7px; flex-shrink: 0;
+}
+.btn-grp { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 600;
+    padding: 8px 14px; border-radius: 6px;
+    border: 1px solid #333; background: #222; color: #999;
+    cursor: pointer; transition: all 0.12s; white-space: nowrap;
+}
+.btn:hover { background: #2a2a2a; color: #ccc; }
+.btn.on { background: #f99d25; color: #000; border-color: #f99d25; }
+
+/* Emphasized Next Station Button */
+.btn-next {
+    background: #39ff14; color: #000; border-color: #39ff14;
+    font-size: 14px; padding: 10px 20px; font-weight: 800;
+}
+.btn-next:hover { background: #32e011; }
+.btn-next:active { transform: scale(0.96); }
+
+.station-scroll {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    max-height: 120px; overflow-y: auto; padding: 2px;
+}
+.sbtn {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 4px;
+    border: 1px solid #2a2a2a; background: #151515; color: #666;
+    cursor: pointer; transition: all 0.12s; white-space: nowrap;
+}
+.sbtn:hover { background: #222; color: #aaa; }
+.sbtn.on { background: #f99d25; color: #000; border-color: #f99d25; }
+</style>
 </head>
 <body>
 
-    <div class="display-container">
-        <!-- SVG Circular Line Map -->
-        <div class="circle-container">
-            <svg class="circle-svg" viewBox="0 0 200 200">
-                <circle class="track-bg" cx="100" cy="100" r="80" />
-                <circle class="track-progress" id="trackProgress" cx="100" cy="100" r="80" />
-                <g id="stationNodesGroup"></g>
-            </svg>
-            <div class="circle-inner" id="lineName">CIRCLE<br>LINE</div>
-        </div>
-        
-        <div class="station-code" id="stationCode">CC1</div>
-        <div class="station-name" id="stationName">Dhoby Ghaut</div>
-        
-        <!-- Door Indicator Banner -->
-        <div class="door-banner">
-            <div class="door-side" id="doorLeft">&lt;&lt; DOORS OPENING</div>
-            <div class="door-side" id="doorRight">DOORS OPENING &gt;&gt;</div>
-        </div>
+<div class="drmd-outer">
+  <div class="drmd-panel">
 
-        <div class="status-box" id="statusText">ARRIVING AT STATION</div>
-        <br>
-        <button class="btn" onclick="nextStation()">Next Station</button>
+    <div class="lcd-header">
+      <div class="lcd-dest" id="lcdDest">Circle Line</div>
+      <div class="lcd-status" id="lcdStatus"></div>
     </div>
 
-    <script>
-        // Full list of operational Circle Line stations (CC1 - CC29, CC18 Bukit Brown skipped)
-        const stations = [
-            { code: "CC1", name: "Dhoby Ghaut", doorSide: "right" },
-            { code: "CC2", name: "Bras Basah", doorSide: "left" },
-            { code: "CC3", name: "Esplanade", doorSide: "right" },
-            { code: "CC4", name: "Promenade", doorSide: "right" },
-            { code: "CC5", name: "Nicoll Highway", doorSide: "left" },
-            { code: "CC6", name: "Stadium", doorSide: "right" },
-            { code: "CC7", name: "Mountbatten", doorSide: "left" },
-            { code: "CC8", name: "Dakota", doorSide: "right" },
-            { code: "CC9", name: "Paya Lebar", doorSide: "right" },
-            { code: "CC10", name: "MacPherson", doorSide: "left" },
-            { code: "CC11", name: "Tai Seng", doorSide: "right" },
-            { code: "CC12", name: "Bartley", doorSide: "right" },
-            { code: "CC13", name: "Serangoon", doorSide: "right" },
-            { code: "CC14", name: "Lorong Chuan", doorSide: "left" },
-            { code: "CC15", name: "Bishan", doorSide: "right" },
-            { code: "CC16", name: "Marymount", doorSide: "right" },
-            { code: "CC17", name: "Caldecott", doorSide: "left" },
-            { code: "CC19", name: "Botanic Gardens", doorSide: "right" },
-            { code: "CC20", name: "Farrer Road", doorSide: "left" },
-            { code: "CC21", name: "Holland Village", doorSide: "right" },
-            { code: "CC22", name: "Buona Vista", doorSide: "right" },
-            { code: "CC23", name: "one-north", doorSide: "left" },
-            { code: "CC24", name: "Kent Ridge", doorSide: "right" },
-            { code: "CC25", name: "Haw Par Villa", doorSide: "left" },
-            { code: "CC26", name: "Pasir Panjang", doorSide: "right" },
-            { code: "CC27", name: "Labrador Park", doorSide: "right" },
-            { code: "CC28", name: "Telok Blangah", doorSide: "left" },
-            { code: "CC29", name: "HarbourFront", doorSide: "right" }
-        ];
+    <div class="map-row">
+      <div class="door-overlay left" id="doorLeft">
+        <div class="door-content">
+            DOORS<br>OPENING<br>THIS SIDE
+            <div class="chevron">▼ ▼</div>
+        </div>
+      </div>
 
-        let currentIndex = 0;
-        const totalStations = stations.length;
-        const radius = 80;
-        const circumference = 2 * Math.PI * radius;
+      <div class="map-area">
+        <svg id="mapSvg" viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
 
-        // Build SVG Station Nodes around the Circle
-        function initCircularMap() {
-            const group = document.getElementById("stationNodesGroup");
-            group.innerHTML = "";
+      <div class="door-overlay right" id="doorRight">
+        <div class="door-content">
+            DOORS<br>OPENING<br>THIS SIDE
+            <div class="chevron">▼ ▼</div>
+        </div>
+      </div>
+    </div>
 
-            stations.forEach((station, index) => {
-                const angle = (index / totalStations) * (2 * Math.PI);
-                const x = 100 + radius * Math.cos(angle);
-                const y = 100 + radius * Math.sin(angle);
+  </div>
+</div>
 
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", x);
-                circle.setAttribute("cy", y);
-                circle.setAttribute("class", "station-node");
-                circle.setAttribute("id", `node-${index}`);
-                group.appendChild(circle);
+<div class="controls">
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Manual Control</span>
+    <div class="btn-grp">
+      <button class="btn btn-next" onclick="triggerNextStation()">▶ NEXT STATION</button>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Jump To Station</span>
+    <div class="station-scroll" id="stationBtns"></div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Direction</span>
+    <div class="btn-grp">
+      <button class="btn on" id="btnCW"  onclick="setDir('cw')">⟳ Outer Loop (HarbourFront)</button>
+      <button class="btn"    id="btnCCW" onclick="setDir('ccw')">⟲ Inner Loop (Dhoby Ghaut)</button>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Location</span>
+    <div class="btn-grp">
+      <button class="btn on" id="btnTrain"   onclick="setLoc('train')">🚇 In-train</button>
+      <button class="btn"    id="btnStation" onclick="setLoc('station')">🚉 At station</button>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Screen text</span>
+    <div class="btn-grp" id="textBtns">
+      <button class="btn on" data-t="station">Station</button>
+      <button class="btn"    data-t="courtesy">Courtesy</button>
+      <button class="btn"    data-t="gap">Mind the Gap</button>
+      <button class="btn"    data-t="closing">Doors Closing</button>
+      <button class="btn"    data-t="terminus">Terminus</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// STATIONS (Full Loop CCL)
+// ════════════════════════════════════════
+const CCL = [
+    {c:'CC1',  n:'Dhoby Ghaut',        ix:['NSL','NEL'], door:'L'},
+    {c:'CC2',  n:'Bras Basah',         ix:[],            door:'L'},
+    {c:'CC3',  n:'Esplanade',          ix:[],            door:'R'},
+    {c:'CC4',  n:'Promenade',          ix:['DTL'],       door:'L'},
+    {c:'CC5',  n:'Nicoll Highway',     ix:[],            door:'R'},
+    {c:'CC6',  n:'Stadium',            ix:[],            door:'L'},
+    {c:'CC7',  n:'Mountbatten',        ix:[],            door:'R'},
+    {c:'CC8',  n:'Dakota',             ix:[],            door:'L'},
+    {c:'CC9',  n:'Paya Lebar',         ix:['EWL'],       door:'R'},
+    {c:'CC10', n:'MacPherson',         ix:['DTL'],       door:'L'},
+    {c:'CC11', n:'Tai Seng',           ix:[],            door:'R'},
+    {c:'CC12', n:'Bartley',            ix:[],            door:'L'},
+    {c:'CC13', n:'Serangoon',          ix:['NEL'],       door:'R'},
+    {c:'CC14', n:'Lorong Chuan',       ix:[],            door:'L'},
+    {c:'CC15', n:'Bishan',             ix:['NSL'],       door:'R'},
+    {c:'CC16', n:'Marymount',          ix:[],            door:'L'},
+    {c:'CC17', n:'Caldecott',          ix:['TEL'],       door:'R'},
+    {c:'CC19', n:'Botanic Gardens',    ix:['DTL'],       door:'L'},
+    {c:'CC20', n:'Farrer Road',        ix:[],            door:'R'},
+    {c:'CC21', n:'Holland Village',    ix:[],            door:'L'},
+    {c:'CC22', n:'Buona Vista',        ix:['EWL'],       door:'R'},
+    {c:'CC23', n:'one-north',          ix:[],            door:'L'},
+    {c:'CC24', n:'Kent Ridge',         ix:[],            door:'R'},
+    {c:'CC25', n:'Haw Par Villa',      ix:[],            door:'L'},
+    {c:'CC26', n:'Pasir Panjang',      ix:[],            door:'R'},
+    {c:'CC27', n:'Labrador Park',      ix:[],            door:'L'},
+    {c:'CC28', n:'Telok Blangah',      ix:[],            door:'R'},
+    {c:'CC29', n:'HarbourFront',       ix:['NEL'],       door:'L'},
+    {c:'CC30', n:'Keppel',             ix:[],            door:'R'},
+    {c:'CC31', n:'Cantonment',         ix:[],            door:'L'},
+    {c:'CC32', n:'Prince Edward Road', ix:[],            door:'R'},
+    {c:'CC33', n:'Marina Bay',         ix:['NSL','TEL'], door:'L'},
+    {c:'CC34', n:'Bayfront',           ix:['DTL'],       door:'R'},
+];
+
+const LINE_COLORS = {
+    CCL: '#f99d25',
+    NSL: '#d42e12',
+    EWL: '#009645',
+    NEL: '#9900aa',
+    DTL: '#005da9',
+    TEL: '#9d5b25',
+};
+
+// ════════════════════════════════════════
+// GEOMETRY — True Ellipse Layout
+// ════════════════════════════════════════
+const CX = 500;
+const CY = 200;
+const RX = 380;
+const RY = 140; 
+const N = CCL.length;
+const POS = [];
+
+// Calculate geometric positions along the perimeter of the ellipse
+// Start at roughly top-right for Dhoby Ghaut (-PI/2 is top, going slightly clockwise)
+const START_ANGLE = -Math.PI / 2 + 0.3; 
+
+CCL.forEach((_, i) => {
+    const angle = START_ANGLE + (i / N) * 2 * Math.PI;
+    const x = CX + RX * Math.cos(angle);
+    const y = CY + RY * Math.sin(angle);
+    POS.push({ x, y, angle });
+});
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let curIdx   = 0;
+let dir      = 'cw';
+let loc      = 'train';
+let textMode = 'station';
+
+function nxtIdx(i, d) {
+    if (d === 'cw')  return i === N - 1 ? 0 : i + 1; // Full loop
+    else             return i === 0 ? N - 1 : i - 1;
+}
+const getCur  = () => CCL[curIdx];
+const getNext = () => CCL[nxtIdx(curIdx, dir)];
+
+// ════════════════════════════════════════
+// SVG HELPER
+// ════════════════════════════════════════
+function svgEl(tag, attrs, txt) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+    if (txt !== undefined) el.textContent = txt;
+    return el;
+}
+
+// Generate an SVG Arc string between two points on the ellipse
+function getArcPath(i1, i2, sweepFlag) {
+    const p1 = POS[i1];
+    const p2 = POS[i2];
+    return `M ${p1.x} ${p1.y} A ${RX} ${RY} 0 0 ${sweepFlag} ${p2.x} ${p2.y}`;
+}
+
+// ════════════════════════════════════════
+// BUILD MAP
+// ════════════════════════════════════════
+function buildMap() {
+    const svg = document.getElementById('mapSvg');
+    svg.innerHTML = '';
+
+    const next = getNext();
+    const sweep = dir === 'cw' ? 1 : 0;
+
+    // ── 1. Base Dim Track (Full Loop) ──
+    const dimGroup = svgEl('g', { opacity: '0.25' });
+    dimGroup.appendChild(svgEl('ellipse', {
+        cx: CX, cy: CY, rx: RX, ry: RY,
+        fill: 'none', stroke: LINE_COLORS.CCL,
+        'stroke-width': '6'
+    }));
+    svg.appendChild(dimGroup);
+
+    // ── 2. Bright Active Track (Highlight Current to Next Segment) ──
+    // Instead of illuminating the whole future track which gets messy on circles,
+    // we strictly illuminate the train's current block traversal.
+    const activeGroup = svgEl('g');
+    const pathD = getArcPath(curIdx, nxtIdx(curIdx, dir), sweep);
+    
+    activeGroup.appendChild(svgEl('path', {
+        d: pathD,
+        fill: 'none', stroke: LINE_COLORS.CCL,
+        'stroke-width': '6', 'stroke-linecap': 'round'
+    }));
+    
+    // Flow line overlay
+    activeGroup.appendChild(svgEl('path', {
+        d: pathD,
+        fill: 'none', stroke: '#fff',
+        'stroke-width': '2', 'stroke-linecap': 'round',
+        class: 'flow-line' + (dir === 'ccw' ? ' ccw' : '')
+    }));
+    svg.appendChild(activeGroup);
+
+    // ── 3. Station Dots & Labels ──
+    CCL.forEach((st, i) => {
+        const { x, y, angle } = POS[i];
+        const isCur  = i === curIdx;
+        const isNext = st.c === next.c;
+        const hasIx  = st.ix.length > 0;
+        
+        // Define past vs future based on CW/CCW
+        let isPast = false;
+        if (dir === 'cw') {
+            isPast = (i < curIdx && curIdx - i < N/2) || (i > curIdx && i - curIdx > N/2);
+        } else {
+            isPast = (i > curIdx && i - curIdx < N/2) || (i < curIdx && curIdx - i > N/2);
+        }
+
+        const op     = isPast && !isCur && !isNext ? '0.3' : '1';
+        const r      = isCur ? 7 : hasIx ? 5.5 : 4;
+        const fill   = isCur ? '#fff' : (isPast ? '#555' : '#fff');
+        const stroke = isCur ? LINE_COLORS.CCL : (isPast ? '#333' : '#000');
+        const sw     = isCur ? 3 : 2;
+
+        // Station Dot
+        svg.appendChild(svgEl('circle', {
+            cx: x, cy: y, r, fill, stroke, 'stroke-width': sw, opacity: op
+        }));
+
+        // Current Station Pulsing Halo
+        if (isCur) {
+            const halo = svgEl('circle', {
+                cx: x, cy: y, r: 12, fill: LINE_COLORS.CCL, opacity: '0.4'
+            });
+            halo.innerHTML = `<animate attributeName="r" values="7;14;7" dur="1.5s" repeatCount="indefinite" />
+                              <animate attributeName="opacity" values="0.8;0;0.8" dur="1.5s" repeatCount="indefinite" />`;
+            svg.appendChild(halo);
+        }
+
+        // Calculate Text & Interchange Label Anchor logic depending on which side of the circle they are
+        // Normalize angle to [0, 2PI]
+        let normAngle = angle % (2 * Math.PI);
+        if (normAngle < 0) normAngle += 2 * Math.PI;
+        
+        const isLeftSide = normAngle > Math.PI / 2 && normAngle < 3 * Math.PI / 2;
+        const textAnchor = isLeftSide ? 'end' : 'start';
+        
+        // Shift outward along the radius
+        const labelDist = 18;
+        const lx = x + labelDist * Math.cos(angle);
+        const ly = y + labelDist * Math.sin(angle);
+
+        // Text rotation to ensure it points radially but is never upside down
+        let rotDeg = angle * (180 / Math.PI);
+        if (isLeftSide) rotDeg += 180;
+
+        // Render Interchange Pills Stacked Radially Outward
+        if (hasIx) {
+            st.ix.forEach((line, ri) => {
+                const pillDist = labelDist + 22 + (ri * 14); // Push further out radially
+                const px = x + pillDist * Math.cos(angle);
+                const py = y + pillDist * Math.sin(angle);
+                
+                // We rotate the pill itself using SVG transforms
+                const pillGroup = svgEl('g', {
+                    transform: `translate(${px}, ${py}) rotate(${rotDeg})`,
+                    opacity: op
+                });
+
+                // The pill rect is centered on 0,0 locally
+                pillGroup.appendChild(svgEl('rect', {
+                    x: isLeftSide ? -24 : 0, y: -5, width: 24, height: 10, rx: 5,
+                    fill: LINE_COLORS[line]
+                }));
+                
+                // Text inside pill
+                pillGroup.appendChild(svgEl('text', {
+                    x: isLeftSide ? -12 : 12, y: 0,
+                    'text-anchor': 'middle', 'dominant-baseline': 'central',
+                    'font-family': 'Inter, sans-serif', 'font-size': '6.5', 'font-weight': '800',
+                    fill: '#fff'
+                }, line.replace('L',''))); // Abbreviate NSL to NS
+
+                svg.appendChild(pillGroup);
             });
         }
 
-        function updateDisplay() {
-            const station = stations[currentIndex];
-            
-            // Update Text
-            document.getElementById("stationCode").textContent = station.code;
-            document.getElementById("stationName").textContent = station.name;
+        // Station Label Name Text
+        svg.appendChild(svgEl('text', {
+            x: lx, y: ly,
+            'text-anchor': textAnchor,
+            'dominant-baseline': 'middle',
+            'font-family': 'Inter, sans-serif',
+            'font-size': isCur ? '12' : '10',
+            'font-weight': isCur || isNext ? '700' : '600',
+            fill: isCur ? LINE_COLORS.CCL : (isPast ? '#666' : '#fff'),
+            opacity: op,
+            transform: `rotate(${rotDeg}, ${lx}, ${ly})`
+        }, st.n));
+    });
+}
 
-            // Update Circle Map Progress Line
-            const trackProgress = document.getElementById("trackProgress");
-            const progressRatio = currentIndex / (totalStations - 1);
-            const strokeOffset = circumference - (progressRatio * circumference);
-            trackProgress.style.strokeDashoffset = strokeOffset;
+// ════════════════════════════════════════
+// LCD HEADER TEXT
+// ════════════════════════════════════════
+const LED_TEXTS = {
+    station: () => {
+        const nxt2 = getNext();
+        if (loc === 'station') return `Doors open on the ${getCur().door === 'L' ? 'LEFT' : 'RIGHT'}`;
+        return `Next Station: ${nxt2.n} (${nxt2.c})`;
+    },
+    courtesy: () => `Please give up your seat to those who need it more.`,
+    gap:      () => `Please mind the platform gap.`,
+    closing:  () => `Doors closing`,
+    terminus: () => `Terminus: ${getNext().n}`,
+};
 
-            // Update Station Node Highlights
-            stations.forEach((_, idx) => {
-                const node = document.getElementById(`node-${idx}`);
-                node.classList.remove("active", "visited");
-                if (idx < currentIndex) {
-                    node.classList.add("visited");
-                } else if (idx === currentIndex) {
-                    node.classList.add("active");
-                }
-            });
+function updateLED() {
+    const destEl = document.getElementById('lcdDest');
+    const statEl = document.getElementById('lcdStatus');
+    
+    // Set Destination based on direction logic
+    const term = dir === 'cw' ? 'HarbourFront / Complete Loop' : 'Dhoby Ghaut / Complete Loop';
+    destEl.textContent = `Dest: ${term}`;
 
-            // Handle Door Indicator Blinking
-            const doorLeft = document.getElementById("doorLeft");
-            const doorRight = document.getElementById("doorRight");
+    statEl.textContent = LED_TEXTS[textMode]();
+    if(textMode === 'station' && loc === 'station') {
+        statEl.style.color = '#39e030';
+    } else {
+        statEl.style.color = '#fff';
+    }
+}
 
-            doorLeft.classList.remove("active");
-            doorRight.classList.remove("active");
+// ════════════════════════════════════════
+// DOORS OPENING SIDE (Continuous Blinking)
+// ════════════════════════════════════════
+function updateDoors() {
+    const st    = loc === 'station' ? getCur() : getNext();
+    const atStn = loc === 'station';
+    const isL   = st.door === 'L';
 
-            // Force DOM Reflow to ensure animation loops cleanly
-            void doorLeft.offsetWidth;
-            void doorRight.offsetWidth;
+    const dL = document.getElementById('doorLeft');
+    const dR = document.getElementById('doorRight');
+    
+    dL.classList.toggle('active', isL && atStn);
+    dR.classList.toggle('active', !isL && atStn);
+}
 
-            if (station.doorSide === "left") {
-                doorLeft.classList.add("active");
-            } else {
-                doorRight.classList.add("active");
-            }
+// ════════════════════════════════════════
+// CONTROLS (Manual Progression Only)
+// ════════════════════════════════════════
+function triggerNextStation() {
+    curIdx = nxtIdx(curIdx, dir);
+    
+    // When next station is pressed, assume train has arrived at the station automatically
+    // Alternatively, you can toggle loc to 'train' first, but keeping it 'station' immediately
+    // showcases the doors blinking instantly like you requested.
+    loc = 'station'; 
+    document.getElementById('btnTrain').classList.remove('on');
+    document.getElementById('btnStation').classList.add('on');
 
-            // Reset Pulse Animation for Status Text
-            const statusBox = document.getElementById("statusText");
-            statusBox.style.animation = 'none';
-            statusBox.offsetHeight;
-            statusBox.style.animation = 'pulseAnimation 1.5s infinite';
-        }
+    updateDoors(); 
+    updateLED(); 
+    updateStationBtns(); 
+    buildMap();
+}
 
-        function nextStation() {
-            currentIndex = (currentIndex + 1) % stations.length;
-            updateDisplay();
-        }
+function setDir(d) {
+    dir = d;
+    document.getElementById('btnCW').classList.toggle('on',  d === 'cw');
+    document.getElementById('btnCCW').classList.toggle('on', d === 'ccw');
+    updateDoors(); updateLED(); buildMap();
+}
 
-        // Initialize Map and Load First Station
-        initCircularMap();
-        updateDisplay();
-    </script>
+function setLoc(l) {
+    loc = l;
+    document.getElementById('btnTrain').classList.toggle('on',   l === 'train');
+    document.getElementById('btnStation').classList.toggle('on', l === 'station');
+    updateDoors(); updateLED(); buildMap();
+}
 
+document.getElementById('textBtns').addEventListener('click', e => {
+    const btn = e.target.closest('[data-t]');
+    if (!btn) return;
+    textMode = btn.dataset.t;
+    document.querySelectorAll('#textBtns .btn').forEach(b => b.classList.toggle('on', b === btn));
+    updateLED();
+});
+
+function buildStationBtns() {
+    const wrap = document.getElementById('stationBtns');
+    wrap.innerHTML = '';
+    CCL.forEach((st, i) => {
+        const b = document.createElement('button');
+        b.className = 'sbtn' + (i === curIdx ? ' on' : '');
+        b.textContent = `${st.c} ${st.n}`;
+        b.addEventListener('click', () => {
+            curIdx = i;
+            updateDoors(); updateLED(); updateStationBtns(); buildMap();
+        });
+        wrap.appendChild(b);
+    });
+}
+
+function updateStationBtns() {
+    document.querySelectorAll('#stationBtns .sbtn').forEach((b, i) => b.classList.toggle('on', i === curIdx));
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+buildStationBtns();
+updateDoors();
+updateLED();
+buildMap();
+
+</script>
 </body>
 </html>
