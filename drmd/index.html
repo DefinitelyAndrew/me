@@ -9,116 +9,105 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    background: #0d0d0d;
-    min-height: 100vh;
+    background: #111;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    min-height: 100vh;
     padding: 20px 16px;
-    font-family: 'Inter', sans-serif;
+    gap: 16px;
 }
 
-/* ── Display Bezel ── */
 .drmd-outer {
     width: 100%;
-    max-width: 1240px;
-    background: #000000;
-    border-radius: 14px;
+    max-width: 1200px;
+    background: #000;
+    border-radius: 12px;
+    border: 2px solid #333;
     padding: 16px;
-    box-shadow: 
-        0 12px 40px rgba(0,0,0,0.9),
-        inset 0 1px 2px rgba(255,255,255,0.15);
-    border: 2px solid #222;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
 
 .drmd-panel {
     background: #ffffff;
     border-radius: 6px;
     overflow: hidden;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    position: relative;
-    width: 100%;
 }
 
-/* ── LCD Header Bar ── */
 .lcd-header {
     background: #141414;
-    height: 52px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
-    border-bottom: 3px solid #282828;
+    padding: 0 20px;
+    border-bottom: 3px solid #222;
     flex-shrink: 0;
 }
-.lcd-dest { font-size: 16px; font-weight: 700; color: #f99d25; letter-spacing: 0.03em; }
-.lcd-status { font-size: 16px; font-weight: 600; color: #ffffff; }
+.lcd-dest { font-size: 16px; font-weight: 700; color: #f99d25; }
+.lcd-status { font-size: 15px; font-weight: 600; color: #fff; }
 
-/* ── Map Container ── */
-.map-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.map-container {
     width: 100%;
-    padding: 24px 12px;
     background: #ffffff;
+    padding: 20px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.map-area {
+#mapSvg {
     width: 100%;
-    max-width: 1180px;
-    aspect-ratio: 1180 / 420;
-    position: relative;
+    max-width: 1120px;
+    height: auto;
+    display: block;
 }
 
-#mapSvg { 
-    display: block; 
-    width: 100%; 
-    height: 100%;
-}
-
-/* ── Control Console ── */
 .controls {
     width: 100%;
-    max-width: 1240px;
+    max-width: 1200px;
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: #1a1a1a;
-    padding: 18px;
-    border-radius: 10px;
-    border: 1px solid #2c2c2c;
+    border: 1px solid #333;
 }
-.ctrl-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.ctrl-lbl {
-    font-size: 11px; font-weight: 700; color: #888;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    min-width: 120px; padding-top: 8px; flex-shrink: 0;
-}
+.ctrl-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ctrl-lbl { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; min-width: 110px; }
 .btn-grp { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn {
-    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
-    padding: 8px 16px; border-radius: 6px; border: 1px solid #333; background: #222; color: #aaa;
-    cursor: pointer; transition: all 0.12s; white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #222;
+    color: #aaa;
+    cursor: pointer;
 }
-.btn:hover { background: #2d2d2d; color: #fff; }
+.btn:hover { background: #2c2c2c; color: #fff; }
 .btn.on { background: #f99d25; color: #000; border-color: #f99d25; font-weight: 700; }
-
-.btn-next { background: #39ff14; color: #000; border-color: #39ff14; font-size: 14px; padding: 10px 22px; font-weight: 800; }
-.btn-next:hover { background: #32e011; }
-.btn-next:active { transform: scale(0.97); }
-
-.station-scroll {
-    display: flex; gap: 6px; flex-wrap: wrap; max-height: 130px;
-    overflow-y: auto; padding: 4px; width: 100%;
-}
+.btn-next { background: #39ff14; color: #000; border-color: #39ff14; font-size: 14px; font-weight: 800; padding: 10px 20px; }
+.station-scroll { display: flex; gap: 6px; flex-wrap: wrap; max-height: 120px; overflow-y: auto; width: 100%; }
 .sbtn {
-    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
-    padding: 6px 10px; border-radius: 4px; border: 1px solid #333;
-    background: #141414; color: #777; cursor: pointer; transition: all 0.12s; white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #333;
+    background: #151515;
+    color: #777;
+    cursor: pointer;
 }
 .sbtn:hover { background: #222; color: #ccc; }
 .sbtn.on { background: #f99d25; color: #000; border-color: #f99d25; font-weight: 700; }
@@ -130,85 +119,77 @@ body {
   <div class="drmd-panel">
     <div class="lcd-header">
       <div class="lcd-dest" id="lcdDest">Circle Line</div>
-      <div class="lcd-status" id="lcdStatus"></div>
+      <div class="lcd-status" id="lcdStatus">Loading...</div>
     </div>
-
-    <div class="map-row">
-      <div class="map-area">
-        <svg id="mapSvg" viewBox="0 0 1180 420" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
+    <div class="map-container">
+      <svg id="mapSvg" viewBox="0 0 1120 380" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
   </div>
 </div>
 
 <div class="controls">
   <div class="ctrl-row">
-    <span class="ctrl-lbl">Manual Control</span>
+    <span class="ctrl-lbl">Action</span>
     <div class="btn-grp">
       <button class="btn btn-next" onclick="triggerNextStation()">▶ NEXT STATION</button>
     </div>
   </div>
   <div class="ctrl-row">
-    <span class="ctrl-lbl">Jump To Station</span>
+    <span class="ctrl-lbl">Jump To</span>
     <div class="station-scroll" id="stationBtns"></div>
   </div>
   <div class="ctrl-row">
     <span class="ctrl-lbl">Direction</span>
     <div class="btn-grp">
-      <button class="btn on" id="btnCW"  onclick="setDir('cw')">⟳ Outer Loop (via HarbourFront)</button>
-      <button class="btn"    id="btnCCW" onclick="setDir('ccw')">⟲ Inner Loop (via Marina Bay)</button>
+      <button class="btn on" id="btnCW" onclick="setDir('cw')">⟳ Outer Loop (HarbourFront)</button>
+      <button class="btn" id="btnCCW" onclick="setDir('ccw')">⟲ Inner Loop (Marina Bay)</button>
     </div>
   </div>
 </div>
 
 <script>
-// Complete Circle Line Station Directory (CCL1 to CCL34 + Spur)
 const STATIONS = [
-    // Main Loop Top & Sides
-    { c: 'CC29', n: 'HarbourFront',       x: 180, y: 90,  ldir: 1,  ix: ['NE 1'] },
-    { c: 'CC27', n: 'Labrador Park',      x: 290, y: 90,  ldir: 1,  ix: [] },
-    { c: 'CC25', n: 'Haw Par Villa',      x: 400, y: 90,  ldir: 1,  ix: [] },
-    { c: 'CC23', n: 'one-north',          x: 510, y: 90,  ldir: 1,  ix: [] },
-    { c: 'CC21', n: 'Holland Village',    x: 620, y: 90,  ldir: 1,  ix: [] },
-    { c: 'CC19', n: 'Botanic Gardens',    x: 730, y: 90,  ldir: 1,  ix: ['DT 9'] },
-    { c: 'CC16', n: 'Marymount',          x: 870, y: 90,  ldir: 1,  ix: [] },
-    { c: 'CC15', n: 'Bishan',             x: 960, y: 90,  ldir: -1, ix: ['NS 17'] },
-    { c: 'CC14', n: 'Lorong Chuan',       x: 1080, y: 200, ldir: 0,  ix: [] },
-    { c: 'CC13', n: 'Serangoon',          x: 960, y: 310, ldir: -1, ix: ['NE 12'] },
-    { c: 'CC11', n: 'Tai Seng',           x: 850, y: 310, ldir: -1, ix: [] },
-    { c: 'CC10', n: 'MacPherson',         x: 740, y: 310, ldir: -1, ix: ['DT 26'] },
-    { c: 'CC8',  n: 'Dakota',             x: 630, y: 310, ldir: -1, ix: [] },
-    { c: 'CC7',  n: 'Mountbatten',        x: 520, y: 310, ldir: -1, ix: [] },
-    { c: 'CC5',  n: 'Nicoll Highway',     x: 410, y: 310, ldir: -1, ix: [] },
-    { c: 'CC4',  n: 'Promenade',          x: 320, y: 310, ldir: -1, ix: ['DT 15'] },
-    { c: 'CC34', n: 'Bayfront',           x: 240, y: 310, ldir: -1, ix: ['DT 16'] },
-    { c: 'CC33', n: 'Marina Bay',         x: 180, y: 310, ldir: -1, ix: ['NS 27', 'TE 20'] },
-    { c: 'CC32', n: 'Prince Edward Road', x: 120, y: 270, ldir: -1, ix: [] },
-    { c: 'CC31', n: 'Cantonment',         x: 80,  y: 200, ldir: 2,  ix: [] },
-    { c: 'CC30', n: 'Keppel',             x: 120, y: 130, ldir: -1, ix: [] },
-    
-    // Intermediate stations along top/bottom runs
-    { c: 'CC28', n: 'Telok Blangah',      x: 235, y: 90,  ldir: -1, ix: [] },
-    { c: 'CC26', n: 'Pasir Panjang',      x: 345, y: 90,  ldir: -1, ix: [] },
-    { c: 'CC24', n: 'Kent Ridge',         x: 455, y: 90,  ldir: -1, ix: [] },
-    { c: 'CC22', n: 'Buona Vista',        x: 565, y: 90,  ldir: -1, ix: ['EW 21'] },
-    { c: 'CC20', n: 'Farrer Road',        x: 675, y: 90,  ldir: -1, ix: [] },
-    { c: 'CC17', n: 'Caldecott',          x: 810, y: 90,  ldir: -1, ix: ['TE 9'] },
-    { c: 'CC12', n: 'Bartley',            x: 895, y: 310, ldir: -1, ix: [] },
-    { c: 'CC9',  n: 'Paya Lebar',         x: 685, y: 310, ldir: 1,  ix: ['EW 8'] },
-    { c: 'CC6',  n: 'Stadium',            x: 465, y: 310, ldir: 1,  ix: [] },
+    { c: 'CC29', n: 'HarbourFront',       x: 160, y: 80,  ldir: 1,  ix: ['NE 1'] },
+    { c: 'CC27', n: 'Labrador Park',      x: 270, y: 80,  ldir: 1,  ix: [] },
+    { c: 'CC25', n: 'Haw Par Villa',      x: 380, y: 80,  ldir: 1,  ix: [] },
+    { c: 'CC23', n: 'one-north',          x: 490, y: 80,  ldir: 1,  ix: [] },
+    { c: 'CC21', n: 'Holland Village',    x: 600, y: 80,  ldir: 1,  ix: [] },
+    { c: 'CC19', n: 'Botanic Gardens',    x: 710, y: 80,  ldir: 1,  ix: ['DT 9'] },
+    { c: 'CC16', n: 'Marymount',          x: 840, y: 80,  ldir: 1,  ix: [] },
+    { c: 'CC15', n: 'Bishan',             x: 930, y: 80,  ldir: -1, ix: ['NS 17'] },
+    { c: 'CC14', n: 'Lorong Chuan',       x: 1040, y: 190, ldir: 0,  ix: [] },
+    { c: 'CC13', n: 'Serangoon',          x: 930, y: 300, ldir: -1, ix: ['NE 12'] },
+    { c: 'CC11', n: 'Tai Seng',           x: 820, y: 300, ldir: -1, ix: [] },
+    { c: 'CC10', n: 'MacPherson',         x: 710, y: 300, ldir: -1, ix: ['DT 26'] },
+    { c: 'CC8',  n: 'Dakota',             x: 600, y: 300, ldir: -1, ix: [] },
+    { c: 'CC7',  n: 'Mountbatten',        x: 490, y: 300, ldir: -1, ix: [] },
+    { c: 'CC5',  n: 'Nicoll Highway',     x: 380, y: 300, ldir: -1, ix: [] },
+    { c: 'CC4',  n: 'Promenade',          x: 300, y: 300, ldir: -1, ix: ['DT 15'] },
+    { c: 'CC34', n: 'Bayfront',           x: 220, y: 300, ldir: -1, ix: ['DT 16'] },
+    { c: 'CC33', n: 'Marina Bay',         x: 160, y: 300, ldir: -1, ix: ['NS 27', 'TE 20'] },
+    { c: 'CC32', n: 'Prince Edward Road', x: 105, y: 260, ldir: -1, ix: [] },
+    { c: 'CC31', n: 'Cantonment',         x: 70,  y: 190, ldir: 2,  ix: [] },
+    { c: 'CC30', n: 'Keppel',             x: 105, y: 120, ldir: -1, ix: [] },
 
-    // Dhoby Ghaut Branch Spur (Faded/Branched inside)
-    { c: 'CC1',  n: 'Dhoby Ghaut',        x: 160, y: 200, ldir: -1, ix: ['NE 6', 'NS 24'], faded: true },
-    { c: 'CC2',  n: 'Bras Basah',         x: 230, y: 200, ldir: -1, ix: [], faded: true },
-    { c: 'CC3',  n: 'Esplanade',          x: 300, y: 200, ldir: -1, ix: [], faded: true }
+    { c: 'CC28', n: 'Telok Blangah',      x: 215, y: 80,  ldir: -1, ix: [] },
+    { c: 'CC26', n: 'Pasir Panjang',      x: 325, y: 80,  ldir: -1, ix: [] },
+    { c: 'CC24', n: 'Kent Ridge',         x: 435, y: 80,  ldir: -1, ix: [] },
+    { c: 'CC22', n: 'Buona Vista',        x: 545, y: 80,  ldir: -1, ix: ['EW 21'] },
+    { c: 'CC20', n: 'Farrer Road',        x: 655, y: 80,  ldir: -1, ix: [] },
+    { c: 'CC17', n: 'Caldecott',          x: 785, y: 80,  ldir: -1, ix: ['TE 9'] },
+    { c: 'CC12', n: 'Bartley',            x: 875, y: 300, ldir: -1, ix: [] },
+    { c: 'CC9',  n: 'Paya Lebar',         x: 655, y: 300, ldir: 1,  ix: ['EW 8'] },
+    { c: 'CC6',  n: 'Stadium',            x: 435, y: 300, ldir: 1,  ix: [] },
+
+    { c: 'CC1',  n: 'Dhoby Ghaut',        x: 140, y: 190, ldir: -1, ix: ['NE 6', 'NS 24'], faded: true },
+    { c: 'CC2',  n: 'Bras Basah',         x: 210, y: 190, ldir: -1, ix: [], faded: true },
+    { c: 'CC3',  n: 'Esplanade',          x: 280, y: 190, ldir: -1, ix: [], faded: true }
 ];
 
 const LINE_COLORS = {
     CC: '#f99d25', NS: '#d42e12', EW: '#009645', NE: '#9900aa', DT: '#005da9', TE: '#9d5b25'
 };
 
-// Travel sequence around the main loop
 const TRAVEL_SEQUENCE = [
     'CC29','CC28','CC27','CC26','CC25','CC24','CC23','CC22','CC21','CC20','CC19',
     'CC17','CC16','CC15','CC14','CC13','CC12','CC11','CC10','CC9','CC8','CC7',
@@ -240,25 +221,22 @@ function svgEl(tag, attrs, txt) {
 
 function buildMap() {
     const svg = document.getElementById('mapSvg');
+    if (!svg) return;
     svg.innerHTML = '';
 
     const trackGroup = svgEl('g');
-    // Main Oval Loop Path
     const mainTrack = svgEl('path', {
-        d: "M 180 90 L 960 90 A 110 110 0 0 1 1070 200 A 110 110 0 0 1 960 310 L 180 310 A 110 110 0 0 1 70 200 A 110 110 0 0 1 180 90",
+        d: "M 160 80 L 930 80 A 110 110 0 0 1 1040 190 A 110 110 0 0 1 930 300 L 160 300 A 110 110 0 0 1 50 190 A 110 110 0 0 1 160 80",
         fill: "none", stroke: LINE_COLORS.CC, "stroke-width": "7", "stroke-linecap": "round", "stroke-linejoin": "round"
     });
     trackGroup.appendChild(mainTrack);
 
-    // Dhoby Ghaut Spur Branch Path (Connecting Promenade/Bayfront to Dhoby Ghaut)
     const spurTrack = svgEl('path', {
-        d: "M 160 200 L 300 200 C 340 200 320 310 320 310",
+        d: "M 140 190 L 280 190 C 320 190 300 300 300 300",
         fill: "none", stroke: "#fbe2c5", "stroke-width": "6", "stroke-linecap": "round", opacity: "0.8"
     });
     trackGroup.appendChild(spurTrack);
     svg.appendChild(trackGroup);
-
-    drawStaticArrows(svg);
 
     const curSeqI = getSeqIndex(curCode);
 
@@ -270,24 +248,24 @@ function buildMap() {
         } else if (st.faded) {
             state = 'faded';
         } else if (seqI !== -1 && curSeqI !== -1) {
+            let dist = (seqI - curSeqI + TRAVEL_SEQUENCE.length) % TRAVEL_SEQUENCE.length;
             if (dir === 'cw') {
-                let dist = (seqI - curSeqI + TRAVEL_SEQUENCE.length) % TRAVEL_SEQUENCE.length;
                 state = (dist <= TRAVEL_SEQUENCE.length / 2 && dist > 0) ? 'future' : 'past';
             } else {
-                let dist = (curSeqI - seqI + TRAVEL_SEQUENCE.length) % TRAVEL_SEQUENCE.length;
-                state = (dist <= TRAVEL_SEQUENCE.length / 2 && dist > 0) ? 'future' : 'past';
+                let revDist = (curSeqI - seqI + TRAVEL_SEQUENCE.length) % TRAVEL_SEQUENCE.length;
+                state = (revDist <= TRAVEL_SEQUENCE.length / 2 && revDist > 0) ? 'future' : 'past';
             }
         }
 
-        let dotFill, dotStroke, dotR = 6.5, dotStrokeW = 0;
+        let dotFill = '#39ff14', dotStroke = '#39ff14', dotR = 6, dotStrokeW = 0;
         if (state === 'current') {
             dotFill = '#ff0000'; dotStroke = '#ff0000'; dotR = 9;
         } else if (state === 'future') {
             dotFill = '#39ff14'; dotStroke = '#39ff14';
         } else if (state === 'past') {
-            dotFill = '#ffce00'; dotStroke = LINE_COLORS.CC; dotStrokeW = 2.5; dotR = 7.5;
-        } else {
-            dotFill = '#ffffff'; dotStroke = '#fbe2c5'; dotStrokeW = 2;
+            dotFill = '#ffce00'; dotStroke = LINE_COLORS.CC; dotStrokeW = 2.5; dotR = 7;
+        } else if (state === 'faded') {
+            dotFill = '#fff'; dotStroke = '#fbe2c5'; dotStrokeW = 2;
         }
 
         svg.appendChild(svgEl('circle', {
@@ -301,13 +279,13 @@ function buildMap() {
 
 function drawStationLabels(svg, st) {
     const isFaded = st.faded;
-    const opacity = isFaded ? '0.35' : '1';
+    const opacity = isFaded ? '0.4' : '1';
     
     const allCodes = [st.c, ...st.ix];
     let totalPillWidth = 0;
     const pillData = allCodes.map(code => {
         const type = code.substring(0, 2);
-        const w = code.length > 4 ? 42 : 36;
+        const w = code.length > 4 ? 40 : 34;
         totalPillWidth += w + 4;
         return { text: code, type, w };
     });
@@ -319,16 +297,16 @@ function drawStationLabels(svg, st) {
     let nameX = st.x;
 
     if (st.ldir === 1) {
-        pillY = st.y - 22; nameY = st.y - 36;
+        pillY = st.y - 20; nameY = st.y - 32;
     } else if (st.ldir === -1) {
-        pillY = st.y + 11; nameY = st.y + 30;
+        pillY = st.y + 10; nameY = st.y + 26;
     } else if (st.ldir === 2) {
-        startX = st.x - 35 - totalPillWidth;
-        pillY = st.y - 8; nameY = st.y + 14;
+        startX = st.x - 30 - totalPillWidth;
+        pillY = st.y - 8; nameY = st.y + 12;
         nameX = startX + totalPillWidth; textAnchor = "end";
     } else if (st.ldir === 0) {
-        startX = st.x + 22;
-        pillY = st.y - 8; nameY = st.y + 14;
+        startX = st.x + 20;
+        pillY = st.y - 8; nameY = st.y + 12;
         nameX = startX; textAnchor = "start";
     }
 
@@ -340,13 +318,13 @@ function drawStationLabels(svg, st) {
 
         const g = svgEl('g', { opacity });
         g.appendChild(svgEl('rect', {
-            x: curX, y: pillY, width: p.w, height: 16, rx: 8, fill: bg
+            x: curX, y: pillY, width: p.w, height: 15, rx: 7.5, fill: bg
         }));
         
         const txt = svgEl('text', {
-            x: curX + p.w / 2, y: pillY + 11.5,
+            x: curX + p.w / 2, y: pillY + 11,
             'text-anchor': 'middle', 'font-family': 'Inter, sans-serif',
-            'font-size': '9.5', 'font-weight': '700', fill: fg
+            'font-size': '9', 'font-weight': '700', fill: fg
         });
         txt.textContent = p.text;
         g.appendChild(txt);
@@ -357,31 +335,18 @@ function drawStationLabels(svg, st) {
 
     const nameTxt = svgEl('text', {
         x: nameX, y: nameY, 'text-anchor': textAnchor,
-        'font-family': 'Inter, sans-serif', 'font-size': '10.5',
+        'font-family': 'Inter, sans-serif', 'font-size': '10',
         'font-weight': '600', fill: '#111', opacity
     });
     nameTxt.textContent = st.n;
     svg.appendChild(nameTxt);
 }
 
-function drawStaticArrows(svg) {
-    // Top-left direction indicator (Outer Loop CW)
-    svg.appendChild(svgEl('path', {
-        d: "M 25 170 L 25 75 Q 25 45 55 45 L 75 45 L 75 40 L 95 50 L 75 60 L 75 55 L 55 55 Q 35 55 35 75 L 35 170 Z",
-        fill: "#39ff14", stroke: "#ffce00", "stroke-width": "1"
-    }));
-    // Bottom-right direction indicator
-    svg.appendChild(svgEl('path', {
-        d: "M 1155 130 L 1155 225 Q 1155 255 1125 255 L 1105 255 L 1105 260 L 1085 250 L 1105 240 L 1105 245 L 1125 245 Q 1145 245 1145 225 L 1145 130 Z",
-        fill: "#39ff14", stroke: "#ffce00", "stroke-width": "1"
-    }));
-}
-
 function updateLED() {
     const nextCode = TRAVEL_SEQUENCE[nxtIdx(curCode, dir)];
     const nxtSt = getStation(nextCode);
-    document.getElementById('lcdDest').textContent = dir === 'cw' ? 'Dest: Outer Loop (via HarbourFront & Marina Bay)' : 'Dest: Inner Loop (via Marina Bay & HarbourFront)';
-    document.getElementById('lcdStatus').textContent = `Next Station: ${nxtSt.n} (${nxtSt.c})`;
+    document.getElementById('lcdDest').textContent = dir === 'cw' ? 'Dest: Outer Loop (via HarbourFront)' : 'Dest: Inner Loop (via Marina Bay)';
+    document.getElementById('lcdStatus').textContent = `Next: ${nxtSt.n} (${nxtSt.c})`;
 }
 
 function triggerNextStation() {
@@ -398,6 +363,7 @@ function setDir(d) {
 
 function buildStationBtns() {
     const wrap = document.getElementById('stationBtns');
+    if (!wrap) return;
     wrap.innerHTML = '';
     TRAVEL_SEQUENCE.forEach((code) => {
         const st = getStation(code);
@@ -424,8 +390,10 @@ function updateUI() {
     buildMap();
 }
 
-buildStationBtns();
-updateUI();
+window.addEventListener('DOMContentLoaded', () => {
+    buildStationBtns();
+    updateUI();
+});
 </script>
 </body>
 </html>
