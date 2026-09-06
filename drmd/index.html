@@ -24,62 +24,23 @@
             padding: 40px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(255, 158, 27, 0.3);
-            width: 600px;
+            width: 500px; /* Kept original width */
             max-width: 90%;
-            position: relative;
-        }
-        .station-code {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ff9e1b;
-            margin-bottom: 5px;
-            background: #121212;
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 2px solid #ff9e1b;
-        }
-        .station-name {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-        .status-box {
-            font-size: 20px;
-            font-weight: 600;
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: rgba(255, 158, 27, 0.15);
-            color: #ff9e1b;
-            display: inline-block;
-            margin-bottom: 20px;
         }
         
-        /* The Actual Circle */
+        /* Reverted back to the actual solid circle without the spinner gap */
         .circle-container {
             position: relative;
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 25px auto;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px auto;
         }
         .circle-ring {
             width: 100%;
             height: 100%;
-            border: 8px solid transparent;
-            border-top: 8px solid #ff9e1b;
-            border-right: 8px solid #ff9e1b;
+            border: 6px solid #ff9e1b; 
             border-radius: 50%;
-            animation: spinRing 3s linear infinite;
-        }
-        .circle-ring::after {
-            content: '';
-            position: absolute;
-            top: -8px; left: -8px; right: -8px; bottom: -8px;
-            border: 8px solid rgba(255, 158, 27, 0.3);
-            border-radius: 50%;
-            z-index: -1;
+            box-sizing: border-box;
         }
         .circle-inner {
             position: absolute;
@@ -90,34 +51,31 @@
             font-weight: bold;
             color: #ff9e1b;
             text-align: center;
-            line-height: 1.2;
-        }
-        @keyframes spinRing {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
-        /* Doors Indicator */
-        .door-container {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-            margin-bottom: 30px;
-            height: 30px; /* Fixed height so layout doesn't jump */
+        /* Reverted back to original clean text format without the pill background */
+        .station-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff9e1b;
+            margin-bottom: 10px;
         }
+        .station-name {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Centered blinking doors indicator to fit the original format */
         .door-indicator {
             font-size: 20px;
             font-weight: bold;
-            color: #39ff14; /* Neon green often used in train displays */
-            opacity: 0;
+            color: #39ff14;
+            height: 24px;
+            margin-bottom: 25px;
             text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
-        }
-        .door-left {
-            text-align: left;
-        }
-        .door-right {
-            text-align: right;
         }
         .blink-animation {
             animation: blinkFast 0.8s step-end infinite;
@@ -127,7 +85,24 @@
             50% { opacity: 0; }
         }
 
-        /* Button */
+        /* Reverted back to original ARRIVING AT STATION text */
+        .status-box {
+            font-size: 18px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: rgba(255, 158, 27, 0.15);
+            color: #ff9e1b;
+            display: inline-block;
+            animation: pulseAnimation 1.5s infinite;
+            margin-bottom: 30px;
+        }
+        @keyframes pulseAnimation {
+            0% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+            100% { opacity: 0.4; transform: scale(1); }
+        }
+
         .btn {
             background-color: #ff9e1b;
             color: #121212;
@@ -154,25 +129,21 @@
     <div class="display-container">
         <div class="circle-container">
             <div class="circle-ring"></div>
-            <div class="circle-inner" id="lineName">CIRCLE<br>LINE</div>
+            <div class="circle-inner">CC LINE</div>
         </div>
         
         <div class="station-code" id="stationCode">CC1</div>
         <div class="station-name" id="stationName">Dhoby Ghaut</div>
         
-        <div class="door-container">
-            <div class="door-indicator door-left" id="doorLeft">&lt;&lt; DOORS OPENING</div>
-            <div class="door-indicator door-right" id="doorRight">DOORS OPENING &gt;&gt;</div>
-        </div>
+        <div class="door-indicator" id="doorIndicator">&lt;&lt; DOORS OPENING</div>
 
-        <div class="status-box" id="statusText">ARRIVING</div>
+        <div class="status-box" id="statusText">ARRIVING AT STATION</div>
         <br>
         <button class="btn" onclick="nextStation()">Next Station</button>
     </div>
 
     <script>
-        // Full Circle Line stations (Excluding CC18 Bukit Brown as it is currently non-operational)
-        // doorSide is simulated based on a single direction of travel. You can edit 'left' or 'right' to match the exact physical platforms.
+        // Full array containing all operational stations and their respective door sides
         const stations = [
             { code: "CC1", name: "Dhoby Ghaut", doorSide: "right" },
             { code: "CC2", name: "Bras Basah", doorSide: "left" },
@@ -191,7 +162,6 @@
             { code: "CC15", name: "Bishan", doorSide: "right" },
             { code: "CC16", name: "Marymount", doorSide: "right" },
             { code: "CC17", name: "Caldecott", doorSide: "left" },
-            // CC18 Bukit Brown is skipped
             { code: "CC19", name: "Botanic Gardens", doorSide: "right" },
             { code: "CC20", name: "Farrer Road", doorSide: "left" },
             { code: "CC21", name: "Holland Village", doorSide: "right" },
@@ -210,31 +180,28 @@
         function updateDisplay() {
             const station = stations[currentIndex];
             
-            // Update Text
+            // Update Core Info
             document.getElementById("stationCode").textContent = station.code;
             document.getElementById("stationName").textContent = station.name;
             
-            // Handle Door Blinking Logic
-            const doorLeft = document.getElementById("doorLeft");
-            const doorRight = document.getElementById("doorRight");
-            
-            // Reset animations by removing the class first
-            doorLeft.classList.remove("blink-animation");
-            doorRight.classList.remove("blink-animation");
-            
-            // Force DOM reflow to allow animation restart
-            void doorLeft.offsetWidth; 
-            void doorRight.offsetWidth;
-
+            // Handle Door Indicator Direction
+            const doorIndicator = document.getElementById("doorIndicator");
             if (station.doorSide === "left") {
-                doorLeft.classList.add("blink-animation");
-                doorLeft.style.display = "block";
-                doorRight.style.display = "none";
+                doorIndicator.textContent = "<< DOORS OPENING";
             } else {
-                doorRight.classList.add("blink-animation");
-                doorRight.style.display = "block";
-                doorLeft.style.display = "none";
+                doorIndicator.textContent = "DOORS OPENING >>";
             }
+
+            // Reset Door Animation
+            doorIndicator.classList.remove("blink-animation");
+            void doorIndicator.offsetWidth; // Trigger DOM reflow
+            doorIndicator.classList.add("blink-animation");
+
+            // Reset Pulse Animation for Status Box
+            const statusBox = document.getElementById("statusText");
+            statusBox.style.animation = 'none';
+            statusBox.offsetHeight; // Trigger DOM reflow
+            statusBox.style.animation = 'pulseAnimation 1.5s infinite';
         }
 
         function nextStation() {
